@@ -23,9 +23,8 @@ jobs:
       run: ./analyze_dylib.sh
       
     - name: Upload analysis results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3.1.3
       with:
         name: dylib-analysis-results
         path: analysis_output/
         if-no-files-found: warn
-
