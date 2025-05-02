@@ -251,12 +251,10 @@ EOF
     fi
     
     # Symbols
-    SYMBOLS=$(nm "$DYLIB" 2>&1)
-    if [ $? -eq 0 ]; then
-        echo "$SYMBOLS" > "$DYLIB_OUTPUT_DIR/symbols.txt"
+    if nm "$DYLIB" > "$DYLIB_OUTPUT_DIR/symbols.txt" 2>&1; then
         # Get a limited subset for the HTML report
-        SYMBOLS_PREVIEW=$(echo "$SYMBOLS" | head -n 100)
-        SYMBOLS_COUNT=$(echo "$SYMBOLS" | wc -l | tr -d ' ')
+        SYMBOLS_PREVIEW=$(head -n 100 "$DYLIB_OUTPUT_DIR/symbols.txt")
+        SYMBOLS_COUNT=$(wc -l < "$DYLIB_OUTPUT_DIR/symbols.txt" | tr -d ' ')
         
         cat >> "$OUTPUT_DIR/dylib_report.html" << EOF
         <div class="section">
@@ -272,18 +270,16 @@ EOF
         cat >> "$OUTPUT_DIR/dylib_report.html" << EOF
         <div class="section">
             <h3>Symbols</h3>
-            <div class="error">Error extracting symbols: $SYMBOLS</div>
+            <div class="error">Error extracting symbols</div>
         </div>
 EOF
     fi
     
     # Strings
-    STRINGS_OUTPUT=$(strings "$DYLIB" 2>&1)
-    if [ $? -eq 0 ]; then
-        echo "$STRINGS_OUTPUT" > "$DYLIB_OUTPUT_DIR/strings.txt"
+    if strings "$DYLIB" > "$DYLIB_OUTPUT_DIR/strings.txt" 2>&1; then
         # Get a limited subset for the HTML report
-        STRINGS_PREVIEW=$(echo "$STRINGS_OUTPUT" | head -n 100)
-        STRINGS_COUNT=$(echo "$STRINGS_OUTPUT" | wc -l | tr -d ' ')
+        STRINGS_PREVIEW=$(head -n 100 "$DYLIB_OUTPUT_DIR/strings.txt")
+        STRINGS_COUNT=$(wc -l < "$DYLIB_OUTPUT_DIR/strings.txt" | tr -d ' ')
         
         cat >> "$OUTPUT_DIR/dylib_report.html" << EOF
         <div class="section">
@@ -299,18 +295,16 @@ EOF
         cat >> "$OUTPUT_DIR/dylib_report.html" << EOF
         <div class="section">
             <h3>Strings</h3>
-            <div class="error">Error extracting strings: $STRINGS_OUTPUT</div>
+            <div class="error">Error extracting strings</div>
         </div>
 EOF
     fi
     
     # Disassembly
-    DISASSEMBLY=$(otool -tv "$DYLIB" 2>&1)
-    if [ $? -eq 0 ]; then
-        echo "$DISASSEMBLY" > "$DYLIB_OUTPUT_DIR/disassembly.txt"
+    if otool -tv "$DYLIB" > "$DYLIB_OUTPUT_DIR/disassembly.txt" 2>&1; then
         # Get a limited subset for the HTML report
-        DISASSEMBLY_PREVIEW=$(echo "$DISASSEMBLY" | head -n 100)
-        DISASSEMBLY_COUNT=$(echo "$DISASSEMBLY" | wc -l | tr -d ' ')
+        DISASSEMBLY_PREVIEW=$(head -n 100 "$DYLIB_OUTPUT_DIR/disassembly.txt")
+        DISASSEMBLY_COUNT=$(wc -l < "$DYLIB_OUTPUT_DIR/disassembly.txt" | tr -d ' ')
         
         cat >> "$OUTPUT_DIR/dylib_report.html" << EOF
         <div class="section">
@@ -326,7 +320,7 @@ EOF
         cat >> "$OUTPUT_DIR/dylib_report.html" << EOF
         <div class="section">
             <h3>Disassembly</h3>
-            <div class="error">Error disassembling code: $DISASSEMBLY</div>
+            <div class="error">Error disassembling code</div>
         </div>
 EOF
     fi
@@ -357,4 +351,3 @@ cat >> "$OUTPUT_DIR/dylib_report.html" << EOF
 EOF
 
 echo "Analysis complete. Results saved to $OUTPUT_DIR/dylib_report.html"
-
